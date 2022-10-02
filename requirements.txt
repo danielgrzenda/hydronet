@@ -1,0 +1,27 @@
+## data science
+numpy
+scipy
+pandas
+matplotlib
+seaborn
+pytorch-lightning
+lightning-bolts
+torchmetrics
+
+## tools
+wandb
+jupyterlab
+wheel
+pytest
+tqdm
+uuid7
+six
+black
+omegaconf
+globus-cli
+
+## project-specific
+tabulate
+albumentations
+networkx
+ase
