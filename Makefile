@@ -1,7 +1,6 @@
 .DEFAULT_GOAL := help
 
 .PHONY: help
-
 help: ## a guide to the make commands available in this project
 	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
@@ -61,21 +60,26 @@ else
 endif
 dev_tag := $(project_name)_dev_docker
 
+
+.PHONY: info
 info: ## print important configurations on this computer
 	@echo Operating System: $(OSFLAG)
 	@echo Computer Architecture: $(ARCHFLAG)
 	@echo Number of Accelerators: $(gpu_num)
 	@echo M1 Accelerator: $(M1FLAG)
 
+.PHONY: paths
 paths: ## print the paths assosicated with make commands
 	@echo $(mkfile_path)
 	@echo $(current_dir)
 	@echo $(current_abs_path)
 
+.PHONY: docker-build
 docker-build: ## build a new development docker container
 	cd $(current_abs_path)
 	docker build -f ./infra/containers/dev.dockerfile -t $(dev_tag) .
 
+.PHONY: docker-run
 docker-run: ## run the most recently built development docker container
 	cd $(current_abs_path)
 ifeq ($(gpu_num),0)
@@ -84,6 +88,8 @@ else
 	docker run -v $(current_abs_path):/$(project_name) --gpus all --name run_$(project_name)_$(accelerator) --rm -i -t $(dev_tag) bash
 endif
 
+
+.PHONY: docker-jupyter
 docker-jupyter: ## run a jupyter server from the most recently built docker container
 	cd $(current_abs_path)
 ifeq ($(gpu_num),0)
