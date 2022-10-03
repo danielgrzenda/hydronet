@@ -1,3 +1,11 @@
+.DEFAULT_GOAL := help
+
+.PHONY: help
+
+help: ## a guide to the make commands available in this project
+	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+
 OSFLAG :=
 ARCHFLAG :=
 M1FLAG = FALSE
@@ -53,22 +61,22 @@ else
 endif
 dev_tag := $(project_name)_dev_docker
 
-info:
+info: ## print important configurations on this computer
 	@echo Operating System: $(OSFLAG)
 	@echo Computer Architecture: $(ARCHFLAG)
 	@echo Number of Accelerators: $(gpu_num)
 	@echo M1 Accelerator: $(M1FLAG)
 
-paths:
+paths: ## print the paths assosicated with make commands
 	@echo $(mkfile_path)
 	@echo $(current_dir)
 	@echo $(current_abs_path)
 
-docker-build:
+docker-build: ## build a new development docker container
 	cd $(current_abs_path)
 	docker build -f ./infra/containers/dev.dockerfile -t $(dev_tag) .
 
-docker-run:
+docker-run: ## run the most recently built development docker container
 	cd $(current_abs_path)
 ifeq ($(gpu_num),0)
 	docker run -v $(current_abs_path):/$(project_name) --name run_$(project_name)_$(accelerator) --rm -i -t $(dev_tag) bash
@@ -76,7 +84,7 @@ else
 	docker run -v $(current_abs_path):/$(project_name) --gpus all --name run_$(project_name)_$(accelerator) --rm -i -t $(dev_tag) bash
 endif
 
-docker-jupyter:
+docker-jupyter: ## run a jupyter server from the most recently built docker container
 	cd $(current_abs_path)
 ifeq ($(gpu_num),0)
 	docker run -v $(current_abs_path):/$(project_name) --name jupyter_$(project_name)_$(accelerator) --rm -p 8888:8888 -t $(dev_tag) jupyter lab --port=8888 --ip='*' --NotebookApp.token='' --NotebookApp.password='' --no-browser --notebook-dir=/ --allow-root
